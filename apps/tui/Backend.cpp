@@ -59,7 +59,9 @@ static void backend_task(
             auto raw = TRY_OR(serial->read(), continue); // read or continue
 
             auto payload = Payload::deserialize(raw);
-            auto str = fmt::format("{}", payload);
+            auto str = payload.is_ok() ?
+                fmt::format("Added new item: {}", payload.unwrap()) :
+                fmt::format("Fail to deserialize payload: {}", payload.unwrap_err());
 
             deque.push(std::move(raw), std::move(payload));
 

@@ -1,8 +1,7 @@
-#include <ftxui/component/component_options.hpp>
-#include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/elements.hpp>
-#include <parkee-interview/sync_deque.h>
 #include <ftxui/component/component.hpp>
+#include <ftxui/component/screen_interactive.hpp>
+#include <parkee-interview/payload.h>
+#include <parkee-interview/sync_deque.h>
 
 using namespace Project;
 using parkee::Payload, parkee::SyncDeque;

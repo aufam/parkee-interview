@@ -1,8 +1,7 @@
-#include <condition_variable>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
-#include <mutex>
 #include <parkee-interview/sync_deque.h>
+#include <condition_variable>
 
 using namespace Project;
 using parkee::SyncDeque;

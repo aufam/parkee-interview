@@ -1,6 +1,5 @@
 #include <ftxui/component/component.hpp>
-#include <ftxui/dom/canvas.hpp>
-#include <ftxui/dom/elements.hpp>
+#include <parkee-interview/payload.h>
 #include <parkee-interview/sync_deque.h>
 
 using namespace Project;
