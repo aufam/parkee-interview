@@ -22,14 +22,16 @@ namespace Project::parkee {
         /// safely push a new item and call on_push()
         void push(std::vector<uint8_t>&& raw, delameta::Result<Payload>&& data);
 
-        /// safely clear buffer and call on_push()
+        /// safely clear buffer and call on_clear()
         void clear();
 
         /// safely iterate over raw and payload data and execute a function
-        void foreach(const std::function<void(const std::vector<uint8_t>&, const delameta::Result<Payload>&)>&) const;
+        void foreach(const std::function<void(const std::vector<uint8_t>&, const delameta::Result<Payload>&)>&, bool reverse = false) const;
 
         size_t size() const; //< get buffer size
         size_t capacity;     //< get and set capacity
+
+        std::mutex& get_mutex() const;
     };
 }
 

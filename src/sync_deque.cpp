@@ -29,12 +29,19 @@ void parkee::SyncDeque::clear() {
     on_clear();
 }
 
-void parkee::SyncDeque::foreach(const std::function<void(const std::vector<uint8_t>&, const Result<Payload>&)>& f) const {
+void parkee::SyncDeque::foreach(const std::function<void(const std::vector<uint8_t>&, const Result<Payload>&)>& f, bool reverse) const {
     std::lock_guard<std::mutex> lock(mtx);
-    for (const auto &[raw, data]: buffer) f(raw, data);
+    if (not reverse)
+        for (const auto &[raw, data]: buffer) f(raw, data);
+    else
+        for (auto begin = buffer.rbegin(); begin != buffer.rend(); ++begin) f(begin->first, begin->second);
 }
 
 size_t parkee::SyncDeque::size() const {
     std::lock_guard<std::mutex> lock(mtx);
     return buffer.size();
+}
+
+std::mutex& parkee::SyncDeque::get_mutex() const {
+    return mtx;
 }
