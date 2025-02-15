@@ -26,7 +26,7 @@ data handling, and visualization within a Linux environment.
 - [FTXUI](https://github.com/ArthurSonzogni/FTXUI) (Terminal UI)
 - [Catch2](https://github.com/catchorg/Catch2) (Testing Framework)
 
-## Build and Installation
+## Build and Run
 ### Prerequisites
 Ensure you have the following installed:
 - **CMake 3.14+**
@@ -72,9 +72,17 @@ PTY is /dev/pts/4
 This means `/dev/pts/3` and `/dev/pts/4` are now linked, and you can use them as a virtual serial port pair.
 
 ### Running the Application
-On the other terminal you can run:
+In one terminal, run the following command:
 ```sh
 ./build/apps/tui/parkee-tui
+```
+Make sure to input the correct serial port, for example, `/dev/pts/3`
+
+In another terminal, run the following commands to send data:
+```sh
+./build/apps/sender/parkee-sender --ports="/dev/pts/4" --value=0.5 # sending value 0.5
+./build/apps/sender/parkee-sender --ports="/dev/pts/4" --random # sending random value
+./build/apps/sender/parkee-sender --ports="/dev/pts/4" --random --broken # sending broken frame
 ```
 
 For a complete guide you can see the demo animation
