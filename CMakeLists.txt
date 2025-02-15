@@ -7,10 +7,12 @@ project(parkee-interview
 )
 
 # some options
+option(PARKEE_BUILD_QT 	    "Build GUI app with Qt6"	        OFF)
 option(PARKEE_BUILD_TUI     "Build Terminal UI app with FTXUI"  OFF)
 option(PARKEE_BUILD_TESTS   "Generate test cases"               OFF)
 
 # some messages
+message(STATUS "PARKEE_BUILD_QT    : ${PARKEE_BUILD_QT}")
 message(STATUS "PARKEE_BUILD_TUI   : ${PARKEE_BUILD_TUI}")
 message(STATUS "PARKEE_BUILD_TESTS : ${PARKEE_BUILD_TESTS}")
 
@@ -55,6 +57,9 @@ add_subdirectory("apps/sender")
 add_subdirectory("apps/receiver")
 
 # apps and tests
+if (PARKEE_BUILD_QT)
+    add_subdirectory("apps/qt")
+endif()
 if (PARKEE_BUILD_TUI)
     add_subdirectory("apps/tui")
 endif()
