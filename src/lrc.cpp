@@ -2,6 +2,7 @@
 
 using namespace Project;
 
+// simple xor operation
 uint8_t parkee::lrc::encode(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end) {
     uint8_t res = 0x00;
     for (; begin != end; ++begin) res ^= *begin;
