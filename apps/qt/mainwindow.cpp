@@ -219,6 +219,7 @@ void MainWindow::onDisconnect() {
 
 void MainWindow::onClear() {
     chart->clear();
+    Payload::reset(); // reset statistic
     info->setText(u"Buffer cleared"_s);
 }
 
