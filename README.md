@@ -1,4 +1,7 @@
 # Serial Data Visualizer
+![qt-demo](parkee-qt-demo.gif)
+![demo](parkee-demo.gif)
+![tui-demo](parkee-tui-demo.gif)
 
 ## Overview
 The **Serial Data Visualizer** is a terminal-based application
@@ -85,8 +88,7 @@ In another terminal, run the following commands to send data:
 ./build/apps/sender/parkee-sender --ports="/dev/pts/4" --random --broken # sending broken frame
 ```
 
-For a complete guide you can see the demo animation
-![demo](parkee-tui-demo.gif)
+For a complete guide you can see the demo animations above
 
 ## Testing
 The project includes unit tests using **Catch2**:
