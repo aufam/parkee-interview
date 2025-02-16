@@ -57,6 +57,8 @@ private:
     TextWidget *info = new TextWidget(this);
 
     // helper functions
+    void updateStats();
+
     QString createFileDialog(
         const QFileDialog::AcceptMode acceptMode,
         const QString &nameFilter,

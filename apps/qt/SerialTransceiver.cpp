@@ -48,7 +48,6 @@ void SerialTransceiver::receiveData() {
 
     if (payload.is_ok()) {
         emit emitNewValue(payload.unwrap().value);
-        emit emitStats(Payload::get_average(), Payload::get_min(), Payload::get_max());
     }
 }
 

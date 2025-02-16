@@ -46,11 +46,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     toolBar->addAction(actionConnect);
     toolBar->addAction(actionDisconnect);
     toolBar->addAction(actionClear);
+    toolBar->addAction(actionRandomize);
 
     addToolBar(Qt::TopToolBarArea, toolBar);
     connect(actionConnect,    &QAction::triggered, this, &MainWindow::onConnect);
     connect(actionDisconnect, &QAction::triggered, this, &MainWindow::onDisconnect);
     connect(actionClear,      &QAction::triggered, this, &MainWindow::onClear);
+    connect(actionRandomize,  &QAction::triggered, this, [this] {
+        chart->addData(Payload::Random().value);
+        updateStats();
+    });
 
     // side panel
     auto sidePanel = new QGroupBox(); // will be added to window layout
@@ -96,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // side panel: stats
     sidePanelLayout->addWidget(stats);
+    updateStats();
     sidePanelLayout->addStretch(); // empty gap
 
     // side panel: data to send
@@ -159,16 +165,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // connections
     connect(serialTransceiver, &SerialTransceiver::emitNewValue, chart, &Chart::addData);
-    connect(serialTransceiver, &SerialTransceiver::emitMessage, info, &TextWidget::setText);
-    connect(serialTransceiver, &SerialTransceiver::emitStats,
-        this, [this](qreal average, qreal minValue, qreal maxValue) {
-            stats->setText(
-                u"Average = "_s + QString::number(average, 'f', 3) + u"\n"_s
-                u"Min = "_s + QString::number(minValue, 'f', 3) + u"\n"_s
-                u"Max = "_s + QString::number(maxValue, 'f', 3)
-            );
-        }
-    );
+    connect(serialTransceiver, &SerialTransceiver::emitMessage, this, [this](QString msg) {
+        info->setText(msg);
+        updateStats();
+    });
 
     // credits
     connect(actionCredits, &QAction::triggered, this, [this]() {
@@ -182,6 +182,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 MainWindow::~MainWindow() {}
+
+void MainWindow::updateStats() {
+    stats->setText(
+        u"Average = "_s + QString::number(Payload::get_average(), 'f', 3) + u"\n"_s +
+        u"Min = "_s + QString::number(Payload::get_min(), 'f', 3) + u"\n"_s +
+        u"Max = "_s + QString::number(Payload::get_max(), 'f', 3) + u"\n"_s
+    );
+}
 
 void MainWindow::onConnect() {
     const auto &serialSettings = portSettingsDialog->getSettings();
@@ -221,6 +229,7 @@ void MainWindow::onClear() {
     chart->clear();
     Payload::reset(); // reset statistic
     info->setText(u"Buffer cleared"_s);
+    updateStats();
 }
 
 QString MainWindow::createFileDialog(QFileDialog::AcceptMode acceptMode, const QString &nameFilter, const QString &defaultSuffix) {

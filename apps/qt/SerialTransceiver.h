@@ -25,7 +25,6 @@ private slots:
 signals:
     void emitNewValue(qreal value);
     void emitMessage(QString message);
-    void emitStats(qreal average, qreal minValue, qreal maxValue);
 };
 
 #endif
