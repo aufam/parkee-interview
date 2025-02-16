@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include "Chart.h"
-#include "PortSettingsDialog.h"
 #include "SerialTransceiver.h"
+#include "PortSettingsDialog.h"
+#include "ShowLog.h"
 #include "TextWidget.h"
 #include "Action.h"
 
@@ -22,6 +23,7 @@ private:
     // core
     Chart *chart = new Chart(this);
     SerialTransceiver *serialTransceiver = new SerialTransceiver(this);
+    QList<QString> log;
 
     // menu bar: File
     Action *actionSavePlot = new Action("Save Plot", this);
@@ -39,6 +41,7 @@ private:
     Action *actionDisconnect = new Action("Disconnect", this);
     Action *actionClear = new Action("Clear", this);
     Action *actionRandomize = new Action("Randomize", this);
+    Action *actionShowLog = new Action("Show log", this);
 
     // send data
     QLineEdit *dataToSendLineEdit = new QLineEdit();

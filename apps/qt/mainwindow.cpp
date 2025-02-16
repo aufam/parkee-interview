@@ -41,12 +41,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     actionClear->setShortcut(QKeySequence(u"Ctrl+L"_s));
     actionRandomize->setIcon(u":actionAppendToPlot.png"_s);
     actionRandomize->setShortcut(QKeySequence(u"Alt+R"_s));
+    actionShowLog->setIcon(u":actionResetZoom.png"_s);
+    actionShowLog->setShortcut(QKeySequence(u"Alt+L"_s));
 
     auto toolBar = new QToolBar(this);
     toolBar->addAction(actionConnect);
     toolBar->addAction(actionDisconnect);
     toolBar->addAction(actionClear);
     toolBar->addAction(actionRandomize);
+    toolBar->addAction(actionShowLog);
 
     addToolBar(Qt::TopToolBarArea, toolBar);
     connect(actionConnect,    &QAction::triggered, this, &MainWindow::onConnect);
@@ -55,6 +58,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionRandomize,  &QAction::triggered, this, [this] {
         chart->addData(Payload::Random().value);
         updateStats();
+    });
+    connect(actionShowLog,  &QAction::triggered, this, [this] {
+        auto showLog = new ShowLog(log, this);
+        showLog->show();
     });
 
     // side panel
@@ -167,6 +174,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(serialTransceiver, &SerialTransceiver::emitNewValue, chart, &Chart::addData);
     connect(serialTransceiver, &SerialTransceiver::emitMessage, this, [this](QString msg) {
         info->setText(msg);
+        log.append(msg);
         updateStats();
     });
 
@@ -174,7 +182,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionCredits, &QAction::triggered, this, [this]() {
         auto credits =
             u"Plotting and Data Visualization:\n"_s
-            u"https://www.qcustomplot.com/\n\n"_s
+            u"https://www.qcustomplot.com\n\n"_s
             u"Icons:\n"_s
             u"https://github.com/ilya-sotnikov/qUART/tree/main/icons"_s;
         QMessageBox::information(this, u"Credits"_s, credits);
