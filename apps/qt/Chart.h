@@ -52,11 +52,7 @@ private:
     void updateChart();
 
 public slots:
-    void addData(const QSharedPointer<const QList<qreal>> receivedData);
-
-signals:
-    void selectedPointChanged(const QPointF selectedPoint);
-    void autoscaleChanged(const bool autoscaleX, const bool autoscaleY);
+    void addData(qreal value);
 };
 
 #endif

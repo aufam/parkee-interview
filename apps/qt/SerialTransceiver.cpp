@@ -1,7 +1,15 @@
+#include <boost/preprocessor.hpp>
+#include <fmt/ranges.h>
+#include <fmt/chrono.h>
+#include <delameta/debug.h>
+
+#include <parkee-interview/payload.h>
 #include <QSharedPointer>
 #include "SerialTransceiver.h"
 
 using namespace Qt::Literals::StringLiterals;
+using namespace Project;
+using parkee::Payload;
 
 SerialTransceiver::SerialTransceiver(QObject *parent) : QSerialPort(parent) {
     connect(this, &QSerialPort::readyRead, this, &SerialTransceiver::receiveData);
@@ -29,13 +37,18 @@ void SerialTransceiver::deserializeByteArray(QByteArray &byteArray, QList<qreal>
 
 void SerialTransceiver::receiveData() {
     auto byteArray = readAll();
-    QList<qreal> dataList;
+    auto raw = std::vector<uint8_t>(byteArray.size());
+    std::memcpy(raw.data(), byteArray.constData(), byteArray.size());
 
-    deserializeByteArray(byteArray, dataList);
+    auto payload = Payload::deserialize(raw);
 
-    if (!dataList.isEmpty()) {
-        auto dataShared = QSharedPointer<QList<qreal>>::create(dataList);
-        emit newDataAvailable(dataShared);
+    emit emitMessage(QString::fromStdString(
+        fmt::format("Raw: {:02X} {}", fmt::join(raw, " "), payload)
+    ));
+
+    if (payload.is_ok()) {
+        emit emitNewValue(payload.unwrap().value);
+        emit emitStats(Payload::get_average(), Payload::get_min(), Payload::get_max());
     }
 }
 

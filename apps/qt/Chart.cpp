@@ -30,13 +30,12 @@ void Chart::updateChart() {
     plot->replot();
 }
 
-void Chart::addData(const QSharedPointer<const QList<qreal>> receivedData) {
-    for (auto value: *receivedData) {
-        plotData->add(QCPGraphData{currentPlotDataCount, value});
-        currentPlotDataCount += 1.0;
-        if (plotData->size() > bufferSize)
-            plotData->removeBefore(plotData->constBegin()->key + 0.1);
-    }
+void Chart::addData(qreal value) {
+    plotData->add(QCPGraphData{currentPlotDataCount, value});
+    currentPlotDataCount += 1.0;
+    if (plotData->size() > bufferSize)
+        plotData->removeBefore(plotData->constBegin()->key + 0.1);
+
     needsUpdate = true;
 }
 

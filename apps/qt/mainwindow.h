@@ -38,8 +38,9 @@ private:
     Action *actionConnect = new Action("Connect", this);
     Action *actionDisconnect = new Action("Disconnect", this);
     Action *actionClear = new Action("Clear", this);
+    Action *actionRandomize = new Action("Randomize", this);
 
-    // side panel: send data
+    // send data
     QLineEdit *dataToSendLineEdit = new QLineEdit();
     QRadioButton *radioLF = new QRadioButton("LF");
     QRadioButton *radioCR = new QRadioButton("CR");
@@ -48,9 +49,12 @@ private:
     QRadioButton *radioHex = new QRadioButton("Hex");
     QString radioText = "CR";
 
+    // stats
+    TextWidget *stats = new TextWidget(this);
+
     // info
     QStatusBar *statusBar = new QStatusBar(this);
-    TextWidget *infoWidget = new TextWidget(this);
+    TextWidget *info = new TextWidget(this);
 
     // helper functions
     QString createFileDialog(
@@ -58,15 +62,17 @@ private:
         const QString &nameFilter,
         const QString &defaultSuffix
     );
-
-    std::unique_ptr<QTextStream, std::function<void(QTextStream *)>>
-    openFileStream(const QString &fileName, QIODevice::OpenMode flags);
+    std::unique_ptr<QTextStream, std::function<void(QTextStream *)>> openFileStream(
+        const QString &fileName,
+        QIODevice::OpenMode flags
+    );
 
 private slots:
-    void serialConnect();
-    void serialDisconnect() const;
-    void saveImage();
-    void savePlotData();
+    void onConnect();
+    void onDisconnect();
+    void onClear();
+    void onSaveImage();
+    void onSavePlotData();
 };
 
 #endif

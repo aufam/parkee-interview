@@ -23,7 +23,9 @@ private slots:
     void receiveData();
 
 signals:
-    void newDataAvailable(const QSharedPointer<const QList<qreal>> dataList);
+    void emitNewValue(qreal value);
+    void emitMessage(QString message);
+    void emitStats(qreal average, qreal minValue, qreal maxValue);
 };
 
 #endif
