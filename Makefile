@@ -1,5 +1,8 @@
 all: build
 
+configure-qt:
+	cmake -B build -DCMAKE_CXX_STANDARD=20 -DPARKEE_BUILD_QT=ON
+
 configure-tui:
 	cmake -B build -DCMAKE_CXX_STANDARD=20 -DPARKEE_BUILD_TUI=ON
 
