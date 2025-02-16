@@ -181,10 +181,126 @@ make run-tests
 ```
 
 ## Design Decisions
-- **FTXUI**: Lightweight terminal-based UI, and it can be statically linked.
-- **Delameta Framework**: Used for modular and efficient serial communication.
-- **CPM.cmake**: Simplifies dependency management.
+### Data Structure
+[parkee::Payload](./include/parkee-interview/payload.h)
+has two fields which is `time_point timestamp` and `float value`.
+The constructor is set to be private to enforce user to use Factory functions `Payload::New`, `Payload::Random`.
 
+### Statistics
+Average, max, and min values can be optained using static member functions
+`Payload::get_average`, `Payload::get_max`, `Payload::get_min` respectively.
+The values are updated each time `Payload` constructor is invoked.
+The average value is calculated using moving average,
+whilest min and max are calculated using comparison operation.
+
+Here is the source code:
+```c++
+parkee::Payload::Payload(std::chrono::system_clock::time_point timestamp, float value)
+    : timestamp(timestamp)
+    , value(value)
+{
+    // moving average
+    cnt++;
+    average = ((average * (cnt - 1)) + value) / cnt;
+
+    // max and min
+    max = std::isnan(max) ? value : max > value ? max : value;
+    min = std::isnan(min) ? value : min < value ? min : value;
+}
+```
+
+### Serialization and Deserialization
+`Payload::serialize` is a member function that converts `this Payload`
+into `std::vector` with the given frame structures.
+
+`Payload::deserialize` is a **static** member function that construct
+`Payload` from `std::vector`. It returns `delameta::Result<Payload>`
+which holds variant of `Payload` and `delameta::Error`.
+
+This return-error-by-value paradigm is chosen over throw-catch to open the
+possibility of this library to be used in embedded systems / microcontroller
+where throwing exceptions are costly.
+
+You can use the function like:
+```c++
+Result<Payload> payload_result = Payload::deserialize(raw_data);
+if (payload_result.is_ok()) {
+  Payload& payload = payload_result.unwrap();
+  // do something
+} else {
+  Error& err = payload_result.unwrap_err();
+  // do other thing
+}
+```
+
+### LRC Calculation
+Since the LRC is only one byte, simple XOR operation is implemented.
+```c++
+uint8_t parkee::lrc::encode(
+  std::vector<uint8_t>::const_iterator begin,
+  std::vector<uint8_t>::const_iterator end
+) {
+  uint8_t res = 0x00;
+  for (; begin != end; ++begin) res ^= *begin;
+  return res;
+}
+```
+
+### Serial Communication
+In QT App, QSerialPort is used to implement the
+[SerialTransceiver](apps/qt/SerialTransceiver.cpp).
+
+`QSerialPort::readyRead` is connected with `SerialTransceiver::receiveData`
+as follows:
+```c++
+SerialTransceiver::SerialTransceiver(QObject *parent) : QSerialPort(parent) {
+  connect(this, &QSerialPort::readyRead, this, &SerialTransceiver::receiveData);
+}
+```
+
+The `SerialTransceiver::receivedData` reads all available data, deserialize it into
+`Payload` and emit string message as well as payload's value if deserialization succeed
+```c++
+void SerialTransceiver::receiveData() {
+  auto byteArray = readAll();
+  auto raw = std::vector<uint8_t>(byteArray.size());
+  std::memcpy(raw.data(), byteArray.constData(), byteArray.size());
+
+  auto payload = Payload::deserialize(raw);
+
+  emit emitMessage(QString::fromStdString(
+    fmt::format("Raw: {:02X} {}", fmt::join(raw, " "), payload)
+  ));
+
+  if (payload.is_ok()) {
+    emit emitNewValue(payload.unwrap().value);
+  }
+}
+```
+
+And then in the [MainWindow](apps/qt/mainwindow.cpp):
+```c++
+// connections
+connect(serialTransceiver, &SerialTransceiver::emitNewValue, chart, &Chart::addData);
+connect(serialTransceiver, &SerialTransceiver::emitMessage, this, [this](QString msg) {
+  info->setText(msg);
+  log.append(msg);
+  updateStats();
+});
+```
+
+In TUI App, `delameta::Serial` is used to handle serial communication.
+We can do something like:
+```c++
+Result<Payload> payload_result = 
+  Serial::Open(Serial::Args{.port=port, .baud=baud, .timeout=1})
+  .and_then([](Serial serial) {
+    return serial.read();
+  })
+  .and_then([](std::vector<uint8_t> raw_data) {
+    return Payload::deserialize(raw_data);
+  });
+```
 
 ## Credits
 - [QCustomPlot](https://www.qcustomplot.com) 
