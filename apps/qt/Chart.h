@@ -12,7 +12,7 @@ class Chart : public QWidget {
 
 public:
     static constexpr int DefaultInterval = 20;
-    static constexpr ulong DefaultBufferSize = 20;
+    static constexpr int DefaultBufferSize = 20;
 
     explicit Chart(QWidget *parent = nullptr);
     virtual ~Chart() override;
